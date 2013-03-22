@@ -1,4 +1,7 @@
 var http = require("http");
+var url = require("url");
+var fs = require("fs");
+var path = require("path");
 
 function logger(){
     
@@ -24,9 +27,15 @@ function logger(){
     };
 }
 
-function errorHandler(feed, log){
-
+function getExtension(filename) {
+    var ext = path.extname(filename||'').split('.');
+    return ext[ext.length - 1];
 }
+
+var contentTypeMapping = new Array();
+contentTypeMapping["js"] = 'text/javascript';
+contentTypeMapping["html"] = 'text/html';
+contentTypeMapping["css"] = 'text/css';
 
 console.log("starting up...");
 
@@ -47,12 +56,64 @@ var taskIsRunning = false;
 console.log("Starting http server on 127.0.0.1:8080");
 
 http.createServer(function(req, res){    
-    // cache the xml
-    var xml = feed.xml();
+var urlPath = url.parse(req.url).path;
+    
+    console.log("Handling request " + urlPath);
+    
+    if(urlPath == "/favicon.ico"){
+        return;
+    }
+    
+    if(urlPath == "/"){
+        urlPath = "index.html";
+    }
+    else if(urlPath == "/startBuild"){
+    
+        builder.buildProject(options, function(log){
+        
+            var logFilename = path.join(options.LogDirectory, "licensemanagement_" + new Date().getTime() + ".json");
+        
+            fs.writeFile(logFilename, JSON.stringify(log.buffer, null, 4), function(err){
+                if(err) 
+                    console.log(err);
+                        
+                res.writeHead(200, {'Content-Type' : 'application/json'});
+                res.write(JSON.stringify(log.buffer));
+                res.end();
+            });
 
-    res.writeHead(200, {'Content-Type' : 'application/xml'});
-    res.write(xml);
-    res.end();
+        });
+        return;
+    }
+    
+    var ext = getExtension(urlPath);
+    
+    var filePath = "";
+    
+    if(urlPath.indexOf("bootstrap") !== -1 ||
+        ext == "js" ||
+        ext == "css"){
+
+        filePath = "www" + urlPath;
+    }
+    else{
+        filePath = "www/" + ext + "/" + urlPath;
+    }
+    
+    var file = fs.readFileSync(filePath);
+    
+    if(contentTypeMapping.hasOwnProperty(ext)){
+        var contentType = contentTypeMapping[ext];
+        
+        res.writeHead(200, {'Content-Type' : contentType});
+        res.write(file);
+        res.end();
+    }
+    else{
+        res.writeHead(404, {'Content-Type' : 'text/plain'});
+        res.write("Not found - " + ext);
+        res.end();
+    }
 }).listen(8080, '127.0.0.1');
 
 
