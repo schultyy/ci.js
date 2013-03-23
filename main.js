@@ -8,6 +8,8 @@ var options = fs.readFileSync("options.json");
 options = JSON.parse(options);
 
 var buildResultsFolder = options.buildResultsFolder;
+var port = options.port;
+var host = options.host;
 
 function logger(){
     
@@ -102,7 +104,7 @@ var taskTree = taskFile.getTasks({
 
 var taskIsRunning = false;
 
-console.log("Starting http server on 127.0.0.1:8080");
+console.log("Starting http server on " + host + ":" + port);
 
 http.createServer(function(req, res){    
 
@@ -174,7 +176,7 @@ http.createServer(function(req, res){
             res.end();
         }        
     });
-}).listen(8080, '127.0.0.1');
+}).listen(port, host);
 
 
 setInterval(function(){
