@@ -38,7 +38,7 @@ var fs = require("fs");
 exports.getTasks = function(){
     var checkout = new checkoutTask();
     return {
-        name            : "Your projcet",
+        name            : "Your project",
         projectPath     : "/home/foo/bar",
         tasks           : checkout
     };
