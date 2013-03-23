@@ -25,6 +25,12 @@ $(document).ready(function(){
                 $.get(url, function(buildReport){
                     $("#shellOutput").empty();
 
+                    if(buildReport.status == "failed"){
+                    
+                        $("#shellOutput").append($("<div>").append($("<p>").addClass("buildFailed")
+                                                            .html("Build failed")));
+                    }
+
                     var tabs = $("<ul>").addClass("nav nav-tabs");
                     
                     var tabContent = $("<div>").addClass("tab-content");
