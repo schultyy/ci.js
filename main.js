@@ -10,6 +10,7 @@ options = JSON.parse(options);
 var buildResultsFolder = options.buildResultsFolder;
 var port = options.port;
 var host = options.host;
+var buildInterval = options.buildInterval; //in minutes
 
 function logger(){
     
@@ -192,4 +193,4 @@ setInterval(function(){
     log.name = taskTree.name;
     taskTree.tasks.run();    
 
-}, 1 * 60 * 1000);
+}, buildInterval * 60 * 1000);
