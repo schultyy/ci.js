@@ -1,9 +1,18 @@
 @charset "utf-8";
 
-.log-error{
-    color : red;
+#LatestBuildsContainer{
+    margin-left: 5px;
 }
 
-.log-info{
-    color : black;
+#LatestBuilds{
+    margin-left: 5px;
+}
+
+.buildFailed{
+    color:#f31010;
+}
+
+.shellContent{
+    width: 150px;
+    word-wrap: break-word;
 }

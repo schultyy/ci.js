@@ -16,14 +16,19 @@
         </div>
         <div class="row-fluid">
             <div class="span2">
-                <p id="projectName"></p>
-                <p id="localPath"></p>
-                <button class="btn btn-primary" id="triggerBuild">
-                    Trigger new build
-                </button>
+                <p id="projectName" class="lead">
+                    Project
+                </p>
+                <p id="localPath" class="lead">
+                    Local path
+                </p>
+                <div id="LatestBuildsContainer">
+                    <p>Latest builds</p>
+                    <div id="LatestBuilds">
+                    </div>
+                </div>
             </div>
-            <div class="span10" id="shellOutput">
-            </div>
+            <div class="span10" id="shellOutput" />
         </div>
     </body>
 </html>
