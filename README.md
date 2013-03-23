@@ -32,7 +32,12 @@ var child_process = require("child_process");
 var fs = require("fs");
 
 exports.getTasks = function(){
-  return new checkoutTask();
+    var checkout = new checkoutTask();
+    return {
+        name            : "Your projcet",
+        projectPath     : "/home/foo/bar",
+        tasks           : checkout
+    };
 }
 
 function checkoutTask(){
