@@ -65,3 +65,7 @@ function checkoutTask(){
     }
 }
 ```
+
+# Dependencies
+* bootstrap
+* JQuery 1.9.1
