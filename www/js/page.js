@@ -22,15 +22,17 @@ $(document).ready(function(){
             
                 var url = "/buildReport?id=" + currentElement;
                 
-                $.get(url, function(data){
+                $.get(url, function(buildReport){
                     $("#shellOutput").empty();
 
                     var tabs = $("<ul>").addClass("nav nav-tabs");
                     
                     var tabContent = $("<div>").addClass("tab-content");
                     
-                    for(var i = 0; i < data.messages.length; i++){
-                        var currentElement = data.messages[i];
+                    var usedNames = {};
+                    
+                    for(var i = 0; i < buildReport.messages.length; i++){
+                        var currentElement = buildReport.messages[i];
                         
                         var tab = $("<li>");
                         
@@ -38,13 +40,9 @@ $(document).ready(function(){
                             tab = tab.addClass("active");
                         }
                         
-                        if(data.status == "failed"){
-                            tab = tab.addClass("buildFailed");
-                        }
-                        
                         var heading = $("<a>")
                                         .attr("data-toggle","tab")
-                                        .attr("href", "#" + currentElement.name)
+                                        .attr("href", "#" + currentElement.name + i)
                                         .html(currentElement.name);
                         
                         tab.append(heading);
@@ -56,16 +54,13 @@ $(document).ready(function(){
                             content = content.addClass("active");
                         }
                         
-                        content = content.attr("id", currentElement.name)
+                        content = content.attr("id", currentElement.name + i)
                                             .html($("<code>")
                                             .addClass("shellContent")
                                             .html("<pre>" + currentElement.message + "</pre>"));
                         
                         tabContent.append(content);
                     }
-                    $('a[data-toggle="tab"]').on('show', function (e) {
-                        alert("buh");
-                    });
                     $("#shellOutput").append(tabs);
                     $("#shellOutput").append(tabContent);
                 });
