@@ -20,6 +20,10 @@ the following parts:
 ```
 
 Note that buildInterval expresses the interval in minutes. The build results folder must exist, ci.js does not create it.
+## Usage
+```Bash
+$ node main.js tasks.js
+```
 
 ## Task file
 A task file must export a function that is called getTasks. getTasks returns one task, that calls other tasks via 
