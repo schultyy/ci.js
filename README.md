@@ -61,7 +61,7 @@ function checkoutTask(){
     this.run = function(){    
         console.log("checkout");
         
-        var workingDirectory = 'C:\\temp\\<your project>';
+        var workingDirectory = 'C:\\temp\\';
 
         var self = this;
             
