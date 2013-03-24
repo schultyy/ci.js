@@ -28,31 +28,44 @@ $ node main.js tasks.js
 ## Task file
 A task file must export a function that is called getTasks. getTasks returns one task, that calls other tasks via 
 callbacks when it is finished. A task must have a run method. This will be called by ci.js. 
+(Disclaimer: I need this to build my .Net software. So the example below contains Windows paths and calls to MSBuild.)
 This is an example task file:
-
 ```JavaScript
 
 var child_process = require("child_process");
 var fs = require("fs");
 
-exports.getTasks = function(){
+exports.getTasks = function(options){
+
+    var finishedCallback = options.finished;
+
     var checkout = new checkoutTask();
+    var buildTask = new buildTask();
+    
+    checkout.callback = buildTask;
+    
+    //Notify ci.js when build is finished
+    buildTask.callback = {
+        this.run = finishedCallback;
+        this.callback = undefined;
+    };
     return {
         name            : "Your project",
-        projectPath     : "/home/foo/bar",
+        projectPath     : "C:\\Temp\\",
         tasks           : checkout
     };
 }
 
 function checkoutTask(){
+    this.callback = undefined;
     this.run = function(){    
         console.log("checkout");
         
-        var workingDirectory = '/home/foo/tmp';
+        var workingDirectory = 'C:\\temp\\<your project>';
 
         var self = this;
             
-        child_process.exec('git clone <your project>', 
+        child_process.exec('"C:\\Program Files (x86)\\Git\\bin\\sh.exe" --login -i -c "git clone <your project>"', 
         {'cwd' : workingDirectory}, function(error, stdout, stderr){
             if(stdout){
                 console.log("checkout", stdout);
@@ -65,8 +78,41 @@ function checkoutTask(){
                 console.log("checkout", error.code);
                 return;
             }
+            if(self.callback){
+                self.callback.run();
+            }
         });
-    }
+    };
+}
+
+function buildTask(){
+    this.callback = undefined;
+    this.run = function(){
+    
+        console.log("build");
+    
+        var solutionFile = "C:\\temp\\<your project>\\<your solution>.sln";
+        
+        var self = this;
+        
+        child_process.exec('cmd.exe /s /c "C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319\\MSBuild.exe /p:Configuration=Release ' + solutionFile + '"', 
+            function(error, stdout, stderr){
+                if(stdout){
+                    console.log("build", stdout);
+                }
+                if(stderr){
+                    console.log("build", stderr);
+                }
+                if(error){
+                    console.log("build", "Signal: " + error.signal + " / Code: " + error.code);
+                    return;
+                }
+                
+                if(self.callback){
+                    self.callback.run();
+                }
+        });
+    };
 }
 ```
 
