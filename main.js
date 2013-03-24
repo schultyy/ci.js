@@ -79,7 +79,7 @@ var taskFile = process.argv[2];
 
 console.log("Reading " + taskFile);
 
-taskFile = require("./" + taskFile.replace(".js", ""));
+taskFile = require(path.resolve(taskFile));
 
 var log = new logger();
 
