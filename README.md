@@ -37,7 +37,16 @@ var fs = require("fs");
 
 exports.getTasks = function(options){
 
+    //At the moment, options contains a finshed callback and a logger
+
     var finishedCallback = options.finished;
+    
+    /*
+        Available methods:
+        error(name, msg)
+        info(name, msg)
+    */
+    var logger = options.logger;
 
     var checkout = new checkoutTask();
     var buildTask = new buildTask();
@@ -56,7 +65,8 @@ exports.getTasks = function(options){
     };
 }
 
-function checkoutTask(){
+function checkoutTask(logger){
+    this.logger = logger;
     this.callback = undefined;
     this.run = function(){    
         console.log("checkout");
@@ -68,14 +78,14 @@ function checkoutTask(){
         child_process.exec('"C:\\Program Files (x86)\\Git\\bin\\sh.exe" --login -i -c "git clone <your project>"', 
         {'cwd' : workingDirectory}, function(error, stdout, stderr){
             if(stdout){
-                console.log("checkout", stdout);
+                self.logger.info("checkout", stdout);
             }
             if(stderr){
-                console.log("checkout", stderr);
+                self.logger.error("checkout", stderr);
             }
             if(error){
-                console.log("checkout", error.signal);
-                console.log("checkout", error.code);
+                self.logger.error("checkout", error.signal);
+                self.logger.error("checkout", error.code);
                 return;
             }
             if(self.callback){
@@ -85,8 +95,9 @@ function checkoutTask(){
     };
 }
 
-function buildTask(){
+function buildTask(logger){
     this.callback = undefined;
+    this.logger = logger;
     this.run = function(){
     
         console.log("build");
@@ -98,13 +109,13 @@ function buildTask(){
         child_process.exec('cmd.exe /s /c "C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319\\MSBuild.exe /p:Configuration=Release ' + solutionFile + '"', 
             function(error, stdout, stderr){
                 if(stdout){
-                    console.log("build", stdout);
+                    self.logger.info("build", stdout);
                 }
                 if(stderr){
-                    console.log("build", stderr);
+                    self.logger.error("build", stderr);
                 }
                 if(error){
-                    console.log("build", "Signal: " + error.signal + " / Code: " + error.code);
+                    self.logger.error("build", "Signal: " + error.signal + " / Code: " + error.code);
                     return;
                 }
                 
