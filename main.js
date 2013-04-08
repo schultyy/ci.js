@@ -46,6 +46,9 @@ function getExtension(filename) {
 
 function getBuildReports(callback){
     fs.readdir(buildResultsFolder, function(err, files){
+
+        if(err) throw err;
+
         files.sort().reverse();
         if(files.length > 10){
             files = files.slice(0, 10);
