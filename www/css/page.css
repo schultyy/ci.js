@@ -16,3 +16,16 @@
     width: 150px;
     word-wrap: break-word;
 }
+
+#toggleBuild{
+	margin-left: 5px;
+	margin-bottom: 5px;
+}
+
+#sidebar{
+	margin-left: 10px;
+}
+
+#heading{
+	margin-left: 10px;
+}

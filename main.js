@@ -18,7 +18,6 @@ function logger(){
     this.messages = [];
 
     this.error = function(name, msg){
-        //console.log("[ERROR][" + name + "] / " + msg);
         this.messages.push({
             name : name,
             type : 'error',
@@ -27,7 +26,6 @@ function logger(){
         });
     };
     this.info = function(name, msg){
-        //console.log("[INFO][" + name + "] / " + msg);
         this.messages.push({
             name : name,
             type : 'info',
@@ -66,7 +64,7 @@ function getBuildReport(reportId, callback){
     });
 }
 
-function setIntervalForBuild(){
+function setIntervalForBuild(taskTree){
     var taskIsRunning = false;
     return setInterval(function(){
         if(taskIsRunning){
@@ -121,7 +119,7 @@ var taskTree = taskFile.getTasks({
 
 console.log("Starting http server on " + host + ":" + port);
 
-var intervalHandle = null;
+var intervalHandle = undefined;
 
 http.createServer(function(req, res){    
 
@@ -147,6 +145,32 @@ http.createServer(function(req, res){
                 projectPath : taskTree.projectPath,
             }));
             res.end();
+            return;
+        case "/stopBuild":
+            if(intervalHandle){
+                clearInterval(intervalHandle);
+                res.writeHead(200, {'Content-Type' : 'application/json'});
+                res.write(JSON.stringify({Status : "OK"}));
+                res.end();
+            }
+            else{
+                res.writeHead(400, {'Content-Type' : 'application/json'});
+                res.write(JSON.stringify({Status : "Build already stopped"}));
+                res.end();
+            }
+            return;
+        case "/startBuild":
+            if(intervalHandle){
+                res.writeHead(400, {'Content-Type' : 'application/json'});
+                res.write(JSON.stringify({Status : "Build already started"}));
+                res.end();
+            }
+            else{
+                intervalHandle = setIntervalForBuild(taskTree);
+                res.writeHead(200, {'Content-Type' : 'application/json'});
+                res.write(JSON.stringify({Status : "OK"}));
+                res.end();
+            }
             return;
         case "/lastBuilds":        
             getBuildReports(function(results){
@@ -196,4 +220,4 @@ http.createServer(function(req, res){
 }).listen(port, host);
 
 
-intervalHandle = setIntervalForBuild();
+intervalHandle = setIntervalForBuild(taskTree);

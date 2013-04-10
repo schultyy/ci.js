@@ -1,4 +1,13 @@
 $(document).ready(function(){
+
+    $("#toggleBuild").html('stop Build')
+                     .addClass("btn btn-danger");
+                    // .click(function(e){
+                    //     $("toggleBuild").html('start Build');
+                    //     $("toggleBuild").removeClass();
+                    //     $("toggleBuild").addClass("btn btn-primary");
+                    // });
+
     $.get("/projectInfo", function(data){
         $("#projectName").append("<small>" + data.projectName + "</small>");
         $("#localPath").append("<small>" + data.projectPath + "</small>");
