@@ -11,6 +11,7 @@ var buildResultsFolder = options.buildResultsFolder;
 var port = options.port;
 var host = options.host;
 var buildInterval = options.buildInterval; //in minutes
+var log = new logger();
 
 function logger(){
     
@@ -65,6 +66,20 @@ function getBuildReport(reportId, callback){
     });
 }
 
+function setIntervalForBuild(){
+    var taskIsRunning = false;
+    return setInterval(function(){
+        if(taskIsRunning){
+            return;
+        }
+        taskIsRunning = true;
+        log.clear();
+        console.log("Running tasks");
+        log.name = taskTree.name;
+        taskTree.tasks.run();
+    }, buildInterval * 60 * 1000);
+}
+
 var contentTypeMapping = new Array();
 contentTypeMapping["js"] = 'text/javascript';
 contentTypeMapping["html"] = 'text/html';
@@ -83,8 +98,6 @@ var taskFile = process.argv[2];
 console.log("Reading " + taskFile);
 
 taskFile = require(path.resolve(taskFile));
-
-var log = new logger();
 
 var taskTree = taskFile.getTasks({
     logger : log,
@@ -106,9 +119,9 @@ var taskTree = taskFile.getTasks({
             }
 });
 
-var taskIsRunning = false;
-
 console.log("Starting http server on " + host + ":" + port);
+
+var intervalHandle = null;
 
 http.createServer(function(req, res){    
 
@@ -134,7 +147,7 @@ http.createServer(function(req, res){
                 projectPath : taskTree.projectPath,
             }));
             res.end();
-            return;	
+            return;
         case "/lastBuilds":        
             getBuildReports(function(results){
                 res.writeHead(200, {'Content-Type' : 'application/json'});
@@ -183,17 +196,4 @@ http.createServer(function(req, res){
 }).listen(port, host);
 
 
-setInterval(function(){
-    
-    if(taskIsRunning){
-        return;
-    }
-    taskIsRunning = true;
-
-    log.clear();
-    
-    console.log("Running tasks");
-    log.name = taskTree.name;
-    taskTree.tasks.run();    
-
-}, buildInterval * 60 * 1000);
+intervalHandle = setIntervalForBuild();
