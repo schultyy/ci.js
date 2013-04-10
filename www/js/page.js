@@ -10,8 +10,8 @@ $(document).ready(function(){
         
             var time = new Date(parseInt(currentElement));
 
-            var formattedTime = time.getDay() + "." +
-                                time.getMonth() + "." +
+            var formattedTime = time.getDate() + "." +
+                                (time.getMonth() + 1) + "." +
                                 time.getFullYear() + " " +
                                 time.getHours() + ':' + time.getMinutes() + ':' + time.getSeconds();
 
